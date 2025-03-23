@@ -7,6 +7,7 @@ import {SignedIn, SignedOut,useUser, SignOutButton} from "@clerk/nextjs";
 
 export default function NavBar(){
     const {isLoaded, isSignedIn, user} = useUser();
+    
     if (!isLoaded) {
         return null;
     }

@@ -1,16 +1,15 @@
 
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import {SignedIn, SignedOut,useUser, SignOutButton} from "@clerk/nextjs";
 
 export default function NavBar(){
     const {isLoaded, isSignedIn, user} = useUser();
-    
-    if (!isLoaded) {
-        return null;
-    }
+
+    if (!isLoaded) 
+        return <p>Loading ....</p>;
 
     return (
         <nav className="fixed top-0 left-0 w-full bg-white shadow-sm z-50">

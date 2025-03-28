@@ -2,7 +2,7 @@
 
 import { useUser } from "@clerk/nextjs"
 import { useMutation } from "@tanstack/react-query"
-import { error } from "console"
+// import { error } from "console"
 import { useEffect } from "react"
 import { useRouter } from 'next/navigation';
 

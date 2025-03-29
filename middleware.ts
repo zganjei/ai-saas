@@ -6,6 +6,7 @@ const isPublicRoute = createRouteMatcher([
   "/",
   "/sign-up(.*)",
   "/subscribe(.*)",
+  "/api/webhook(.*)",
 ]);
 
 const isSignupRoute = createRouteMatcher([
@@ -13,22 +14,38 @@ const isSignupRoute = createRouteMatcher([
 ]);
 
 
-export default clerkMiddleware(async(auth,req)=>{
-  const userAuth = await auth()
-  const {userId} = userAuth;
-  const {pathname, origin}  = req.nextUrl
-  console.log("middleware info: ", userId,pathname, origin);
-
-  if(!isPublicRoute(req) && !userId){
-    return NextResponse.redirect(new URL("/sign-up",origin))
+export default clerkMiddleware(async (auth, req) => {
+  const { pathname } = req.nextUrl;
+  // **Bypass authentication for Stripe webhooks**
+  console.log("pathname:",pathname)
+  if (pathname.startsWith("/api/webhook")) {
+    console.log("222 reached clerkmiddleware")
+    console.log("Skipping authentication for webhook");
+    return NextResponse.next();
   }
 
-  if(isSignupRoute(req) && userId){
-    return NextResponse.redirect(new URL("/mealplan",origin));
+  const userAuth = await auth();
+  const { userId } = userAuth;
+
+  // specific to codespaces
+  const isLocalhost = req.nextUrl.origin.includes("localhost");
+  const origin = isLocalhost
+    ? process.env.NEXT_PUBLIC_API_URL // Use the Codespaces URL
+    : req.nextUrl.origin; // Otherwise, use the request's origin
+
+  console.log("Middleware info: ", userId, pathname, origin);
+
+  if (!isPublicRoute(req) && !userId) {
+    return NextResponse.redirect(new URL("/sign-up", origin));
   }
 
-  return NextResponse.next()
+  if (isSignupRoute(req) && userId) {
+    return NextResponse.redirect(new URL("/mealplan", origin));
+  }
+
+  return NextResponse.next();
 });
+
 
 export const config = {
   matcher: [

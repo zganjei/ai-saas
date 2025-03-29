@@ -30,7 +30,7 @@ export default function CreateProfile() {
         onSuccess: (data) => {
             router.push("/subscribe")
         },
-        onError: (data) => {
+        onError: (error) => {
             console.log(error);
         }
     });

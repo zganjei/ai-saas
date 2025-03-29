@@ -12,6 +12,7 @@
     "@clerk/nextjs": "^6.12.8",
     "@prisma/client": "^6.5.0",
     "@tanstack/react-query": "^5.69.0",
+    "brew": "^0.0.8",
     "next": "15.2.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

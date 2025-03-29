@@ -4,6 +4,7 @@ import { availablePlans } from "@/lib/plans";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
+import toast, {Toaster} from 'react-hot-toast'
 
 type SubscribeResponse = {
     url: string;
@@ -50,11 +51,14 @@ export default function Subscribe() {
             }
             return subscribeToPlan(planType, userId, email);
         },
+        onMutate:()=>{
+            toast.loading("Processing your subscription details....")
+        },
         onSuccess: (data) => {
             window.location.href = data.url;
         },
         onError: (error) => {
-            console.error(error);
+            toast.error("Something went wrong.")
         },
     });
 
@@ -68,6 +72,7 @@ export default function Subscribe() {
 
     return (
         <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+            <Toaster /> {/* Ensure this is present in your component */}
             <div className="text-center mb-6">
                 <h2 className="text-2xl font-bold">Pricing</h2>
                 <p className="text-gray-600">Get started on our weekly plan or upgrade to monthly or yearly when you're ready.</p>

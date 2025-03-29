@@ -54,4 +54,4 @@ const priceIDMap: Record<string, string> = {
     month: process.env.STRIPE_PRICE_MONTHLY!,
     year: process.env.STRIPE_PRICE_YEARLY!,
 }
-export const getPriceIdFromType = (planType: string) => priceIDMap(planType);
+export const getPriceIdFromType = (planType: string) => priceIDMap[planType];

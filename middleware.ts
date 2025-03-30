@@ -9,20 +9,14 @@ const isPublicRoute = createRouteMatcher([
   "/api/webhook(.*)",
 ]);
 
-const isSignupRoute = createRouteMatcher([
-  "/sign-up(.*)",
-]);
+const isSignupRoute = createRouteMatcher(["/sign-up(.*)",]);
+
+const isMealPlanRoute = createRouteMatcher(["/mealplan(.*)",]);
 
 
 export default clerkMiddleware(async (auth, req) => {
   const { pathname } = req.nextUrl;
   // **Bypass authentication for Stripe webhooks**
-  console.log("pathname:",pathname)
-  if (pathname.startsWith("/api/webhook")) {
-    console.log("222 reached clerkmiddleware")
-    console.log("Skipping authentication for webhook");
-    return NextResponse.next();
-  }
 
   const userAuth = await auth();
   const { userId } = userAuth;
@@ -41,6 +35,10 @@ export default clerkMiddleware(async (auth, req) => {
 
   if (isSignupRoute(req) && userId) {
     return NextResponse.redirect(new URL("/mealplan", origin));
+  }
+
+  if (isMealPlanRoute(req) && userId){
+    
   }
 
   return NextResponse.next();

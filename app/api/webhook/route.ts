@@ -88,11 +88,90 @@ async function handleCheckoutSessionCompleted(session : Stripe.Checkout.Session)
     }
 }
 
-async function handleInvoicePaymentFailed(session : Stripe.Invoice){
-    
+async function handleInvoicePaymentFailed(invoice : Stripe.Invoice){
+    const subId = invoice.subscription as string;
+    if(!subId){
+        return
+    }
+
+    let userId: string | undefined
+
+    try{
+        const profile = await prisma.profile.findUnique({
+            where: {
+                stripeSubscriptionId: subId
+            }, select: {
+                userId: true
+            }
+        })
+
+        if(!profile?.userId){
+            console.log("NO profile found")
+            return
+        }
+
+        userId = profile.userId
+    } catch(error: any){
+        console.log(error.message)
+        return;
+    }
+
+    try{
+        await prisma.profile.update({
+            where: {userId: userId},
+            data:{
+                subscriptionActive: false,
+            }
+        })
+    } catch(error: any){
+        console.log(error.message)
+        return;
+    }
 }
 
 
-async function handleCustomerSubscriptionDeleted(session : Stripe.Subscription){
+async function handleCustomerSubscriptionDeleted(
+    subscription : Stripe.Subscription
+){
+        const subId = subscription.id;
+
+        if(!subId){
+            return
+        }
     
+        let userId: string | undefined
+    
+        try{
+            const profile = await prisma.profile.findUnique({
+                where: {
+                    stripeSubscriptionId: subId
+                }, select: {
+                    userId: true
+                }
+            })
+    
+            if(!profile?.userId){
+                console.log("NO profile found")
+                return
+            }
+    
+            userId = profile.userId
+        } catch(error: any){
+            console.log(error.message)
+            return;
+        }
+    
+        try{
+            await prisma.profile.update({
+                where: {userId: userId},
+                data:{
+                    subscriptionActive: false,
+                    stripeSubscriptionId: null,
+                    subscriptionTier: null,
+                }
+            })
+        } catch(error: any){
+            console.log(error.message)
+            return;
+        }
 }

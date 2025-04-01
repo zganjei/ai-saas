@@ -1,16 +1,25 @@
 import React from "react";
 interface MealPlanInput{
     dietType: string;
-    
+    calories: number;
+    allergies: string;
+    cuisine: string;
+    snack: string;
+    days?: number;    
 }
 
 export default function MealPlanDashboard(){
     function handleSubmit(event: React.FormEvent<HTMLFormElement>){
         event.preventDefault()
         const formData = new FormData(event.currentTarget)
-        const payload = {
-
-        }
+        const payload : MealPlanInput = {
+            dietType: formData.get("dietType")?.toString() || "",
+            calories: Number(formData.get("calories")) || 2000,
+            allergies: formData.get("allergies")?.toString() || "",
+            cuisine: formData.get("cuisine")?.toString() || "",
+            snack: formData.get("snack")?.toString() || "",
+            days: 7,
+        };
     }
     return (
     <div> 

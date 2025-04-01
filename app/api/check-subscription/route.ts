@@ -15,12 +15,13 @@ export async function GET(request:NextRequest){
             where: {userId},
             select: {subscriptionActive: true},
         });
-        
+        console.log(profile?.subscriptionActive)
         return NextResponse.json({
             subscriptionActive: profile?.subscriptionActive,
+
         });
 
     }catch(error:any){
-        return NextResponse.json({error: "Internal Error.", }, {status:500});
+        return NextResponse.json({error: "check-subscription Error.", }, {status:500});
     }
 }

@@ -24,14 +24,17 @@ export default clerkMiddleware(async (auth, req) => {
   const { userId } = userAuth;
 
   // // specific to codespaces
-  const isLocalhost = req.nextUrl.origin.includes("localhost");
-  const origin = isLocalhost
-    ? process.env.NEXT_PUBLIC_API_URL // Use the Codespaces URL
-    : req.nextUrl.origin; // Otherwise, use the request's origin
+  const origin = `http://${req.nextUrl.hostname}:${req.nextUrl.port}`;
+
+  // const isLocalhost = req.nextUrl.origin.includes("localhost");
+  // const origin = isLocalhost
+  //   ? process.env.NEXT_PUBLIC_API_URL // Use the Codespaces URL
+  //   : req.nextUrl.origin; // Otherwise, use the request's origin
 
   console.log("Middleware info: ", userId, pathname, origin);
 
   if(pathname === "/api/check-subscription"){
+    console.log("/api/check-subscription ")
     return NextResponse.next();
   }
 
@@ -46,8 +49,13 @@ export default clerkMiddleware(async (auth, req) => {
   if (isMealPlanRoute(req) && userId){
 
     try{
+      console.log("middleware isMealPlanRoute ")
+      console.log("before middleware fetch "+ `${origin}/api/check-subscription?userId=${userId}`)
       const response = await fetch(`${origin}/api/check-subscription?userId=${userId}`)
+      console.log("after middleware fetch "+ `${origin}api/check-subscription?userId=${userId}`)
+
       const data = await response.json()
+      console.log('Fetch Response Data:', data);
       if(!data.subscriptionActive){
         return NextResponse.redirect(new URL("/subscribe",origin));
       }

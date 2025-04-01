@@ -49,13 +49,9 @@ export default clerkMiddleware(async (auth, req) => {
   if (isMealPlanRoute(req) && userId){
 
     try{
-      console.log("middleware isMealPlanRoute ")
-      console.log("before middleware fetch "+ `${origin}/api/check-subscription?userId=${userId}`)
       const response = await fetch(`${origin}/api/check-subscription?userId=${userId}`)
-      console.log("after middleware fetch "+ `${origin}api/check-subscription?userId=${userId}`)
 
       const data = await response.json()
-      console.log('Fetch Response Data:', data);
       if(!data.subscriptionActive){
         return NextResponse.redirect(new URL("/subscribe",origin));
       }

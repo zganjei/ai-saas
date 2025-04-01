@@ -8,12 +8,12 @@ First, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+```
+
+run stripe
+```
+stripe listen --forward-to http://localhost:3000/api/webhook
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.

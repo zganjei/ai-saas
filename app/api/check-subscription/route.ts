@@ -15,7 +15,6 @@ export async function GET(request:NextRequest){
             where: {userId},
             select: {subscriptionActive: true},
         });
-        console.log(profile?.subscriptionActive)
         return NextResponse.json({
             subscriptionActive: profile?.subscriptionActive,
 

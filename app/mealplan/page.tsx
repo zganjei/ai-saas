@@ -30,17 +30,9 @@ interface MealPlanInput {
   days?: number;
 }
 
-export default function MealPlanDashboard() {
-  const [dietType, setDietType] = useState("");
-  const [calories, setCalories] = useState<number>(2000);
-  const [allergies, setAllergies] = useState("");
-  const [cuisine, setCuisine] = useState("");
-  const [snacks, setSnacks] = useState(false);
-
-  // Initialize the mutation using React Query
-  const mutation = useMutation<MealPlanResponse, Error, MealPlanInput>({
-    mutationFn: async (payload: MealPlanInput) => {
-      const response = await fetch("/api/generate-mealplan", {
+async function generateMealPlan(payload: MealPlanInput){
+    console.log("hello from mealplan")
+    const response = await fetch("/api/generate-mealplan", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -54,7 +46,18 @@ export default function MealPlanDashboard() {
       }
 
       return response.json();
-    },
+}
+
+export default function MealPlanDashboard() {
+  const [dietType, setDietType] = useState("");
+  const [calories, setCalories] = useState<number>(2000);
+  const [allergies, setAllergies] = useState("");
+  const [cuisine, setCuisine] = useState("");
+  const [snacks, setSnacks] = useState(false);
+
+  // Initialize the mutation using React Query
+  const {mutate, isPending, data, isError, isSuccess, error} = useMutation<MealPlanResponse, Error, MealPlanInput>({
+    mutationFn: generateMealPlan,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -69,7 +72,7 @@ export default function MealPlanDashboard() {
       days: 7, // Ensure a weekly plan is generated
     };
 
-    mutation.mutate(payload);
+    mutate(payload);
   };
 
   // Define the days of the week in order
@@ -83,11 +86,14 @@ export default function MealPlanDashboard() {
     "Saturday",
   ];
 
+  if (data){
+    console.log(data);
+  }
   // Function to retrieve the meal plan for a specific day
   const getMealPlanForDay = (day: string): DailyMealPlan | undefined => {
-    if (!mutation.data?.mealPlan) return undefined;
+    if (!data?.mealPlan) return undefined;
 
-    return mutation.data.mealPlan[day];
+    return data.mealPlan[day];
   };
 
   return (
@@ -193,20 +199,18 @@ export default function MealPlanDashboard() {
             <div>
               <button
                 type="submit"
-                disabled={mutation.isPending}
-                className={`w-full bg-emerald-500 text-white py-2 px-4 rounded-md hover:bg-emerald-600 transition-colors ${
-                  mutation.isPending ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                disabled={isPending}
+                className={`w-full bg-emerald-500 text-white py-2 px-4 rounded-md hover:bg-emerald-600 transition-colors `}
               >
-                {mutation.isPending ? "Generating..." : "Generate Meal Plan"}
+                {isPending ? "Generating..." : "Generate Meal Plan"}
               </button>
             </div>
           </form>
 
           {/* Error Message */}
-          {mutation.isError && (
+          {isError && (
             <div className="mt-4 p-3 bg-red-200 text-red-800 rounded-md">
-              {mutation.error?.message || "An unexpected error occurred."}
+              {error?.message || "An unexpected error occurred."}
             </div>
           )}
         </div>
@@ -217,7 +221,7 @@ export default function MealPlanDashboard() {
             Weekly Meal Plan
           </h2>
 
-          {mutation.isSuccess && mutation.data.mealPlan ? (
+          {isSuccess && data.mealPlan ? (
             <div className="h-[600px] overflow-y-auto">
               <div className="space-y-6">
                 {daysOfWeek.map((day) => {
@@ -255,7 +259,7 @@ export default function MealPlanDashboard() {
                 })}
               </div>
             </div>
-          ) : mutation.isPending ? (
+          ) : isPending ? (
             <div className="flex justify-center items-center h-full">
               {/* Spinner */}
               <Spinner />

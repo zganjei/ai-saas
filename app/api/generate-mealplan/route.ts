@@ -8,7 +8,6 @@ const openAI = new OpenAI({
 })
 
 export async function POST(request: NextRequest){
-    console.log("hello from generate");
     try{
         const {dietType, calories, allergies, cuisine, snacks, days} = 
             await request.json();
@@ -51,7 +50,6 @@ export async function POST(request: NextRequest){
                 
             Return just the json with no extra commentaries and no backticks.
             `;
-            console.log("hello from generate2");
         const response = await openAI.chat.completions.create({
             model: "meta-llama/llama-3.3-70b-instruct:free",
             messages: [
@@ -63,14 +61,12 @@ export async function POST(request: NextRequest){
             temperature: 0.7,
             max_tokens: 1500,
             });
-            console.log("hello from generate 3");
             const aiContent = response.choices[0].message.content!.trim();
 
             let parsedMealPlan: {[day: string]: DailyMealPlan};
 
             try{
                 parsedMealPlan = JSON.parse(aiContent)
-                return NextResponse.json(parsedMealPlan)
             }catch (parseError){
                 console.error("Error parsing ai response", parseError)
                 return NextResponse.json(
@@ -81,6 +77,9 @@ export async function POST(request: NextRequest){
             if (typeof parsedMealPlan!== "object" || parsedMealPlan === null){
                 return NextResponse.json({mealPlan: parsedMealPlan})
             }
+
+            // Return the parsed meal plan
+            return NextResponse.json({ mealPlan: parsedMealPlan });
 
     } catch (error: any){
         return NextResponse.json({error:" Internal Error."}, {status: 500})

@@ -60,6 +60,8 @@ export default function MealPlanDashboard() {
     mutationFn: generateMealPlan,
   });
 
+  console.log(".............................received meal plan data", data);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 

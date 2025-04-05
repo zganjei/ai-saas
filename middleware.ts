@@ -24,7 +24,13 @@ export default clerkMiddleware(async (auth, req) => {
   const { userId } = userAuth;
 
   // // specific to codespaces
-  const origin = `http://${req.nextUrl.hostname}`;
+  let origin = `http://${req.nextUrl.hostname}`;
+
+  if (req.nextUrl.hostname === 'localhost') {
+    origin = `http://localhost:3000`;
+  }
+
+
 
   // const isLocalhost = req.nextUrl.origin.includes("localhost");
   // const origin = isLocalhost
@@ -49,13 +55,18 @@ export default clerkMiddleware(async (auth, req) => {
   if (isMealPlanRoute(req) && userId){
 
     try{
+      console.log("try  fetch"+ `${origin}/api/check-subscription?userId=${userId}`)
       const response = await fetch(`${origin}/api/check-subscription?userId=${userId}`)
 
       const data = await response.json()
       if(!data.subscriptionActive){
+        console.log("middleware 1")
         return NextResponse.redirect(new URL("/subscribe",origin));
       }
     }catch(error: any){
+
+      console.log("middleware 2")
+      console.error(error)
       return NextResponse.redirect(new URL("/subscribe",origin));
     }
 

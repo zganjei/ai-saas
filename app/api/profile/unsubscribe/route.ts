@@ -13,12 +13,6 @@ export async function POST(request:NextRequest){
             return NextResponse.json({error: "Unauthorized"})
         }
 
-        const {newPlan} = await request.json();
-
-        if(!newPlan){
-            return NextResponse.json({error: "New plan is required"})
-        }
-
         const profile = await prisma.profile.findUnique({
             where: {userId:clerkUser.id},
         });
@@ -32,34 +26,25 @@ export async function POST(request:NextRequest){
         }
 
         const subscriptionId = profile.stripeSubscriptionId;
-        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-        const subscriptionItemId = subscription.items.data[0]?.id;
 
-        if(!subscriptionItemId){
-            return NextResponse.json({error: "No Active Subscription found"});
-        }
 
-        const updatedSubscription = await stripe.subscriptions.update(subscriptionId, {
-            cancel_at_period_end:false,
-            items: [
-                {
-                    id:subscriptionItemId,
-                    price: getPriceIdFromType(newPlan)
-                },
-            ],
-            proration_behavior:"create_prorations",
-        });
+        const canceledSubscription = await stripe.subscriptions.update(
+            subscriptionId, 
+            {
+            cancel_at_period_end:true,
+            }
+        );
 
         await prisma.profile.update({
             where: {userId: clerkUser.id},
             data: {
-                subscriptionTier: newPlan,
-                stripeSubscriptionId: updatedSubscription.id,
-                subscriptionActive: true
+                subscriptionTier: null,
+                stripeSubscriptionId: null,
+                subscriptionActive: false
             }
         })
 
-        return NextResponse.json({subscription: updatedSubscription})
+        return NextResponse.json({subscription: canceledSubscription})
     } catch (error: any){
         return NextResponse.json({error: "Internal Error"}, {status: 500})
     }

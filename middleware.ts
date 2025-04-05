@@ -24,7 +24,7 @@ export default clerkMiddleware(async (auth, req) => {
   const { userId } = userAuth;
 
   // // specific to codespaces
-  const origin = `http://${req.nextUrl.hostname}:${req.nextUrl.port}`;
+  const origin = `http://${req.nextUrl.hostname}`;
 
   // const isLocalhost = req.nextUrl.origin.includes("localhost");
   // const origin = isLocalhost

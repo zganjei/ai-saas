@@ -12,7 +12,7 @@ type ApiResponse = {
 }
 
 async function createProfileRequest(){
-    const response = await fetch('/api/create-profile', {
+    const response = await fetch('http://sturdy-system-jjjqjjqqxjvfjg4-3000.app.github.dev/api/create-profile', {
         method:"POST",
         headers: {
             "Content-Type": "application/json"
